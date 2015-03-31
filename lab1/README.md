@@ -1,7 +1,6 @@
 # Lab 1
 The solution of 1-D problem of convection–diffusion equation with scheme: `explicit left corner`.
 
-__[http://mipt.ru/drec/upload/7c2/lab1-arpgyfe1u5e.pdf](Condition of the problem)__
 
 # Usage
 ## Without *MPI*
