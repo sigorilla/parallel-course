@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <errno.h>
 
 /**
  * ---------------------- Global Defines ----------------------
@@ -55,7 +56,7 @@ int *t_ids;
 /**
  * Barrier variable
  */
-pthread_barrier_t barr;
+pthread_barrier_t barrier;
 
 /**
  * Program has two arrays in order to save each state
@@ -101,7 +102,7 @@ char *filename;
 
 int arg_check( int, char ** );
 void initialize_board( int ** );
-void read_file( int **, char * );
+int read_file( int **, char * );
 void *entry_function( void * );
 void play( int **, int **, int, int );
 int adjacent_to( int **, int, int );
@@ -190,7 +191,9 @@ int main( int argc, char **argv ) {
 	 * If we have default dimensions read input state from file
 	 */
 	if ( filename != NULL ) {
-		read_file( curptr, filename );
+		if ( read_file( curptr, filename ) ) {
+			return -1;
+		}
 	} else {
 		/**
 		 * In case of play mode with user input dimensions 
@@ -222,8 +225,8 @@ int main( int argc, char **argv ) {
 	/**
 	 * Barrier initialization
 	 */
-	if ( pthread_barrier_init( &barr, NULL, nthreads ) ) {
-		printf( "Could not create a barrier\n" );
+	if ( pthread_barrier_init( &barrier, NULL, nthreads ) ) {
+		printf( "Error of initialization barrier: %s\n", strerror( errno ) );
 		return -1;
 	}
 
@@ -233,7 +236,7 @@ int main( int argc, char **argv ) {
 	for ( i = 0; i < nthreads; i++ ) {
 		t_ids[ i ] = i;
 		if ( pthread_create( &thr[ i ], NULL, &entry_function, ( void * ) &t_ids[ i ] ) ) {
-			printf( "Could not create thread %d\n", i );
+			printf( "Error of creating thread: %s\n", strerror( errno ) );
 			return -1;
 		}
 	}
@@ -243,7 +246,7 @@ int main( int argc, char **argv ) {
 	 */
 	for ( i = 0; i < nthreads; i++ ) {
 		if ( pthread_join( thr[ i ], NULL ) ) {
-			printf( "Could not join thread %d\n", i );
+			printf( "Error of joining thread: %s\n", strerror( errno ) );
 			return -1;
 		}
 	}
@@ -254,7 +257,6 @@ int main( int argc, char **argv ) {
 	print( curptr );
 
 	free_memory();
-
 
 	return 0;
 }
@@ -371,21 +373,27 @@ void initialize_board( int **curptr ) {
  * Read the initial state of the board from a file in default mode
  * @param curptr Current state
  * @param name   Filename
+ * @return       Error, if file descriptor if wrong
  */
-void read_file( int **curptr, char *name ) {
-	FILE *f;
+int read_file( int **curptr, char *name ) {
+	FILE *fd;
 	int i, j;
 	char s[ MAX_WIDTH ];
 
-	f = fopen( name, "r" );
+	fd = fopen( name, "r" );
+	if ( fd == NULL ) {
+		printf("Error opening file: %s\n", strerror( errno ) );
+		return 1;
+	}
 	for ( i = 0; i < height; i++ ) {
-		fgets( s, MAX_WIDTH, f );
+		fgets( s, MAX_WIDTH, fd );
 		for ( j = 0; j < width; j++ ) {
 			curptr[ i ][ j ] = ( s[ j ] == 'x' );
 		}
 	}
 
-	fclose( f );
+	fclose( fd );
+	return 0;
 }
 
 
@@ -429,7 +437,7 @@ void *entry_function( void *t_id ) {
 		 * At this point, the barrier resets to the state it had as a result of 
 		 * the most recent pthread_barrier_init function that referenced it.
 		 */
-		bn = pthread_barrier_wait(&barr);
+		bn = pthread_barrier_wait( &barrier );
 		if ( bn != 0 && bn != PTHREAD_BARRIER_SERIAL_THREAD ) {
 			printf( "Could not wait on barrier\n" );
 			exit( -1 );
@@ -483,7 +491,7 @@ void *entry_function( void *t_id ) {
 		 * One more barrier is needed in order to ensure 
 		 * that the pointers have been swapped before go to next round
 		 */
-		bn = pthread_barrier_wait( &barr );
+		bn = pthread_barrier_wait( &barrier );
 		if ( bn != 0 && bn != PTHREAD_BARRIER_SERIAL_THREAD ) {
 			printf( "Could not wait on barrier\n" );
 			exit( -1 );
@@ -618,6 +626,8 @@ void free_memory() {
 	free( array2 );
 
 	free( t_ids );
+
+	pthread_barrier_destroy( &barrier );
 }
 
 /**
