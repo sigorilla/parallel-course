@@ -75,8 +75,6 @@ void *Summator( void *arg ) {
 
 		sum += 1.0 / start;
 
-		printf( "ID: %d | n = %d\n", id, start );
-
 		pthread_mutex_unlock( &mutex );
 		start++;
 	}

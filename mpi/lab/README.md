@@ -14,4 +14,10 @@ Execute: `./<execfile> <T> <X> <K> <M>`, `T` and `X` - maximum of time and coord
 If the execution is successfully, the file with solution will be created in the same directory.
 
 ## With *MPI*
-__TODO:: create file using MPI__
+__Parameters__
+* `h` - step for X
+* `L` - length of X 
+* `tau` - step for T
+* `T` - length of T
+
+With `graph.py` you can plot figure in Python.
