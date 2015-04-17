@@ -7,10 +7,10 @@ Using pthread
 ##Execute: 
 
 `./GOL OPTIONS`
-OPTIONS:
-	* `-n` - Number of Threads (mandatory option)
-	* `-h` - Set Board Height (Raws)
-	* `-w` - Set Board Width (Columns)
-	* `-f` - Input File
-	* `-s` - Step Mode
-	* `-m` - Count of Steps (default: 100)
+
+* `-n` - Number of Threads (mandatory option)
+* `-h` - Set Board Height (Raws)
+* `-w` - Set Board Width (Columns)
+* `-f` - Input File
+* `-s` - Step Mode
+* `-m` - Count of Steps (default: 100)
