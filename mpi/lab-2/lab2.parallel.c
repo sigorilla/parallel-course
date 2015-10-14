@@ -15,6 +15,9 @@ int main(int argc, char **argv) {
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
+    MPI_Status status;
+
+    double t_start = MPI_Wtime();
 
     int divN = (int) (ISIZE / size);
     int modN = ISIZE % size;
@@ -36,23 +39,38 @@ int main(int argc, char **argv) {
         for (j = 0; j < JSIZE; j++) {
             a[i][j] = sin(0.00001 * a[i][j]);
         }
+        if (rank != 0) {
+            MPI_Send(a[i], JSIZE, MPI_DOUBLE, 0, i, MPI_COMM_WORLD);
+        }
     }
-
-    MPI_Barrier(MPI_COMM_WORLD);
 
     if (rank == 0) {
 
-        FILE *ff;
+        double t_end = MPI_Wtime();
+        printf("time: %lf\n", t_end - t_start);
+        //FILE *ff;
 
-        ff = fopen("result.parallel.txt", "w");
-        for (i = 0; i < ISIZE; i++) {
+        //ff = fopen("result.parallel.txt", "w");
+        for (i = start; i < end; i++) {
             for (j = 0; j < JSIZE; j++) {
-                fprintf(ff, "%f ", a[i][j]);
+                //fprintf(ff, "%f ", a[i][j]);
             }
-            fprintf(ff, "\n");
+            //fprintf(ff, "\n");
         }
 
-        fclose(ff);
+        int k;
+        for (k = end; k < ISIZE; k++) {
+            double tmp[JSIZE];
+            int tmp_rank = (int) (k / divN);
+            tmp_rank = (tmp_rank == size) ? tmp_rank - 1 : tmp_rank;
+            MPI_Recv(tmp, JSIZE, MPI_DOUBLE, tmp_rank, k, MPI_COMM_WORLD, &status);
+            for (j = 0; j < JSIZE; j++) {
+                //fprintf(ff, "%f ", tmp[j]);
+            }
+            //fprintf(ff, "\n");
+        }
+
+        //fclose(ff);
     }
 
     MPI_Finalize();
