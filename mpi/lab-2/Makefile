@@ -2,11 +2,11 @@ CC=gcc
 MPICC=mpicc
 CFLAGS=-lm
 
-all: Simple Parallel
+all: preSimple preParallel
 
-Simple: lab2.simple.c 
-	$(CC) $(CFLAGS) -o lab2.simple.out lab2.simple.c
+preSimple: prelab2.simple.c 
+	$(CC) $(CFLAGS) -o prelab2.simple.out prelab2.simple.c
 
-Parallel: lab2.parallel.c 
-	$(MPICC) $(CFLAGS) -o lab2.parallel.out lab2.parallel.c
+preParallel: prelab2.parallel.c 
+	$(MPICC) $(CFLAGS) -o prelab2.parallel.out prelab2.parallel.c
 
