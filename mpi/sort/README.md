@@ -38,3 +38,5 @@ mpirun -np <P> <file> <N>
 * `P` — максимальное кол-во тредов
 * `NFIRST`— начальный размер массива
 * `NINC` — шаг увеличения размера массива с каждой итерацией
+
+[Пример графиков](https://docs.google.com/spreadsheets/d/13S82YP6E0S2_ZPUxkCdlJAyQiGcxJO7nkBxAfRZW8S0/edit?usp=sharing)
