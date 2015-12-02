@@ -10,14 +10,14 @@ k = int(num[0])
 m = int(num[1])
 i = 0
 for line in f:
-	str_u = list(map(float, line.split()))
-	if i <= k:
-		u.append(str_u)
-	elif i == k+2:
-		x = str_u
-	elif i == k+3:
-		y = str_u
-	i += 1
+    str_u = list(map(float, line.split()))
+    if i <= k:
+        u.append(str_u)
+    elif i == k+2:
+        x = str_u
+    elif i == k+3:
+        y = str_u
+    i += 1
 
 
 u = np.array(u)
